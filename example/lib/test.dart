@@ -1,299 +1,182 @@
-import 'package:equatable/equatable.dart';
 import 'package:example/master.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-abstract class AppMasterState extends MasterState<AppMasterState> with EquatableMixin {
+class WelcomeLocation extends HubLocation {
   @override
-  AppMasterState toPrevious([bool isFirst = true]) {
-    return this;
-  }
+  String get bluePath => '/out';
 
-  AppMasterState toUnauthWelcome() => WelcomeNodeState();
-
-  AppMasterState toAuthHome() {
-    return HomeNodeState(
-      productListState: ProductListMasterState(),
-      homeState: HomeMasterState(),
-      infoState: InfoMasterState(),
-      currentState: 0,
+  @override
+  Page buildPage(BuildContext context) {
+    return DevicePage(
+      name: bluePath,
+      builder: (context) => FakeScreen(
+        debugLabel: 'Welcome',
+        onTap: () => context.hub.push(SignInLocation()),
+        onSecondaryTap: () => context.hub.replaceAll([HomeLocation()]),
+        color: Colors.lightBlue,
+      ),
     );
   }
-
-  @override
-  List<Object> get props => [];
-
-  @override
-  bool get stringify => true;
 }
 
-class WelcomeNodeState extends AppMasterState {
+class SignInLocation extends HubLocation {
   @override
-  AppMasterState toPrevious([bool isFirst = true]) => toUnauthWelcome();
-
-  AppMasterState toUnauthSignIn() => SignInNodeState();
-}
-
-class SignInNodeState extends WelcomeNodeState {
-  @override
-  AppMasterState toPrevious([bool isFirst = true]) {
-    return isFirst ? super.toPrevious(false) : toUnauthSignIn();
-  }
-}
-
-class HomeNodeState extends AppMasterState {
-  final int currentState;
-  final List<MasterState<MasterState>> states;
-
-  final ProductListMasterState productListState;
-  final HomeMasterState homeState;
-  final InfoMasterState infoState;
-
-  HomeNodeState({
-    @required this.productListState,
-    @required this.homeState,
-    @required this.infoState,
-    @required this.currentState,
-  }) : states = [productListState, homeState, infoState];
-
-  HomeNodeState.from(HomeNodeState state)
-      : this(
-          productListState: state.productListState,
-          homeState: state.homeState,
-          infoState: state.infoState,
-          currentState: state.currentState,
-        );
+  String get bluePath => '/out/signIn';
 
   @override
-  AppMasterState toPrevious([bool isFirst = true]) {
-    if (!isFirst) return toAuthHome();
-    switch (currentState) {
-      case 0:
-        return changeHomeTab(productListState: productListState.toPrevious(isFirst));
-      case 1:
-        return changeHomeTab(homeState: homeState.toPrevious(isFirst));
-      case 2:
-        return changeHomeTab(infoState: infoState.toPrevious(isFirst));
-    }
-    return this;
-  }
-
-  AppMasterState toAuthHome() {
-    return HomeNodeState(
-      productListState: productListState,
-      homeState: homeState,
-      infoState: infoState,
-      currentState: 0,
+  Page buildPage(BuildContext context) {
+    return DevicePage(
+      name: bluePath,
+      builder: (context) => FakeScreen(
+        debugLabel: 'Welcome->SignIn',
+        onTap: () => context.hub.replaceAll([HomeLocation()]),
+        onSecondaryTap: () => context.hub.pop(),
+        color: Colors.blue,
+      ),
     );
   }
+}
 
-  AppMasterState toAuthSetting() => SettingNodeState(this);
+class HomeLocation extends HubLocation {
+  @override
+  String get bluePath => '/in';
 
-  AppMasterState changeHomeTab({
-    ProductListMasterState productListState,
-    HomeMasterState homeState,
-    InfoMasterState infoState,
-    int currentState,
-  }) {
-    return HomeNodeState(
-      productListState: productListState ?? this.productListState,
-      homeState: homeState ?? this.homeState,
-      infoState: infoState ?? this.infoState,
-      currentState: currentState ?? this.currentState,
+  @override
+  Page buildPage(BuildContext context) {
+    return DevicePage(
+      name: bluePath,
+      builder: (context) => HomeScreen(),
     );
   }
-
-  @override
-  List<Object> get props => [currentState, ...states];
 }
 
-class ProductListMasterState extends MasterState<ProductListMasterState> with EquatableMixin {
+class SettingsLocation extends HubLocation {
   @override
-  ProductListMasterState toPrevious([bool isFirst = true]) => toProduct();
-
-  ProductListMasterState toProduct() => ProductNodeState();
+  String get bluePath => '/in/settings';
 
   @override
-  List<Object> get props => [];
-}
-
-class ProductNodeState extends ProductListMasterState {
-  @override
-  ProductListMasterState toPrevious([bool isFirst = true]) {
-    return isFirst ? super.toPrevious(false) : toProduct();
+  Page buildPage(BuildContext context) {
+    return DevicePage(
+      name: bluePath,
+      builder: (context) => FakeScreen(debugLabel: 'Home->Settings'),
+    );
   }
 }
 
-class HomeMasterState extends MasterState<HomeMasterState> with EquatableMixin {
+class ProductsListLocation extends HubLocation {
   @override
-  HomeMasterState toPrevious([bool isFirst = true]) => HomeMasterState();
-
-  @override
-  List<Object> get props => [];
-}
-
-class InfoMasterState extends MasterState<InfoMasterState> with EquatableMixin {
-  @override
-  InfoMasterState toPrevious([bool isFirst = true]) => toMoreInfo();
-
-  InfoMasterState toMoreInfo() => MoreInfoMasterState();
+  String get bluePath => '/in/products';
 
   @override
-  List<Object> get props => [];
-}
-
-class MoreInfoMasterState extends InfoMasterState {
-  @override
-  InfoMasterState toPrevious([bool isFirst = true]) {
-    return isFirst ? super.toPrevious(false) : toMoreInfo();
-  }
-
-  @override
-  List<Object> get props => [];
-}
-
-class SettingNodeState extends HomeNodeState {
-  SettingNodeState(HomeNodeState state) : super.from(state);
-
-  @override
-  HomeNodeState toPrevious([bool isFirst = true]) {
-    return isFirst ? super.toPrevious(false) : toAuthSetting();
+  Page buildPage(BuildContext context) {
+    return DevicePage(
+      name: bluePath,
+      builder: (context) => FakeScreen(
+        debugLabel: 'Home\nProducts',
+        onTap: () => context.hub.push(ProductLocation()),
+        color: Colors.green,
+      ),
+    );
   }
 }
 
-class MyRouterDelegate extends MasterRouterDelegate<AppMasterState> {
-  MyRouterDelegate() : super(SignInNodeState());
+class ProductLocation extends HubLocation {
+  @override
+  String get bluePath => '/in/products/:idProduct|';
 
   @override
-  Future<void> setNewRoutePath(AppMasterState configuration) async {
-    print('configuration: $configuration');
-  }
-
-  List<Page> buildPages(BuildContext context, AppMasterState state) {
-    return [
-      if (state is WelcomeNodeState) ...[
-        MaterialPage(
-          child: FakeScreen(
-            debugLabel: 'First Welcome Page',
-            onTap: () => context.goTo<AppMasterState, WelcomeNodeState>((it) => it.toAuthHome()),
-            color: Colors.lightBlue,
-          ),
-        ),
-        if (state is SignInNodeState) ...[
-          MaterialPage(
-            child: Builder(
-              builder: (context) => WillPopScope(
-                onWillPop: () async {
-                  print('Pop?');
-                  return false;
-                },
-                child: FakeScreen(
-                  debugLabel: 'Second Welcome Page',
-                  onTap: () => Navigator.pop(context),
-                  color: Colors.blue,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ] else if (state is HomeNodeState) ...[
-        MaterialPage(
-          child: HomeScreen(),
-        ),
-        if (state is SettingNodeState) ...[
-          MaterialPage(
-            child: FakeScreen(debugLabel: 'Settings'),
-          ),
-        ],
-      ],
-    ];
+  Page buildPage(BuildContext context) {
+    return DevicePage(
+      name: bluePath,
+      builder: (context) => FakeScreen(debugLabel: 'Home\nProducts\nProduct'),
+    );
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class DashboardLocation extends HubLocation {
+  @override
+  String get bluePath => '/in/dashboard';
+
+  @override
+  Page buildPage(BuildContext context) {
+    return DevicePage(
+      name: bluePath,
+      builder: (context) => FakeScreen(debugLabel: 'Home\nDashboard', color: Colors.white),
+    );
+  }
+}
+
+class InfoLocation extends HubLocation {
+  @override
+  String get bluePath => '/in/info';
+
+  @override
+  Page buildPage(BuildContext context) {
+    return DevicePage(
+      name: bluePath,
+      builder: (context) => FakeScreen(debugLabel: 'Home\nInfo'),
+    );
+  }
+}
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final navigator = MasterProvider.of<AppMasterState>(context);
-    final page = navigator.state as HomeNodeState;
+  _HomeScreenState createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
+  final _productsHub = HubDelegate(
+    locations: [
+      ProductsListLocation(),
+      ProductLocation(),
+    ],
+  );
+
+  final _homeHub = HubDelegate(
+    locations: [
+      DashboardLocation(),
+    ],
+  );
+  final _infoHub = HubDelegate(
+    locations: [
+      InfoLocation(),
+    ],
+  );
+
+  int _currentIndex = 0;
+
+  void onTapNavigationBar(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         actions: [
           IconButton(
-            onPressed: () => navigator.goTo<HomeNodeState>((pg) => pg.toAuthSetting()),
+            onPressed: () => context.hub.push(SettingsLocation()),
             icon: const Icon(Icons.settings),
           ),
         ],
       ),
-      body: IndexedStack(
-        index: page.currentState,
-        children: [
-          MasterNavigator<AppMasterState, ProductListMasterState>(
-            reader: (nodePage) => page.productListState,
-            updater: (nodePage, page) {
-              return nodePage is HomeNodeState
-                  ? nodePage.changeHomeTab(productListState: page)
-                  : nodePage;
-            },
-            pagesBuilder: (context, page) {
-              return [
-                MaterialPage(
-                  child: GestureDetector(
-                    onTap: () {
-                      context.goTo<ProductListMasterState, ProductListMasterState>((pg) {
-                        return pg.toProduct();
-                      });
-                    },
-                    child: Container(color: Colors.yellow),
-                  ),
-                ),
-                if (page is ProductNodeState) ...[
-                  MaterialPage(
-                    child: FakeScreen(debugLabel: 'Product Tap\nSecondary Page'),
-                  ),
-                ],
-              ];
-            },
-          ),
-          MasterNavigator<AppMasterState, HomeMasterState>(
-            reader: (nodePage) => page.homeState,
-            updater: (nodePage, page) {
-              return nodePage is HomeNodeState ? nodePage.changeHomeTab(homeState: page) : nodePage;
-            },
-            pagesBuilder: (context, page) {
-              return [
-                MaterialPage(child: FakeScreen(debugLabel: 'Home Page')),
-              ];
-            },
-          ),
-          MasterNavigator<AppMasterState, InfoMasterState>(
-            reader: (nodePage) => page.infoState,
-            updater: (nodePage, page) {
-              return nodePage is HomeNodeState ? nodePage.changeHomeTab(infoState: page) : nodePage;
-            },
-            pagesBuilder: (context, state) {
-              return [
-                MaterialPage(
-                  child: FakeScreen(
-                    debugLabel: 'Info Page',
-                    onTap: () =>
-                        context.goTo<InfoMasterState, InfoMasterState>((pg) => pg.toMoreInfo()),
-                  ),
-                ),
-                if (state is MoreInfoMasterState) ...[
-                  MaterialPage(child: FakeScreen(debugLabel: 'More Info PAge')),
-                ],
-              ];
-            },
-          ),
+      body: StackHub(
+        index: _currentIndex,
+        hubDelegates: [
+          _productsHub,
+          _homeHub,
+          _infoHub,
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: page.currentState,
-        onTap: (index) =>
-            navigator.goTo<HomeNodeState>((pg) => pg.changeHomeTab(currentState: index)),
+        currentIndex: _currentIndex,
+        onTap: onTapNavigationBar,
         items: [
           BottomNavigationBarItem(
             icon: const Icon(Icons.extension),
@@ -316,23 +199,35 @@ class HomeScreen extends StatelessWidget {
 class FakeScreen extends StatelessWidget {
   final String debugLabel;
   final VoidCallback onTap;
+  final VoidCallback onSecondaryTap;
   final Color color;
 
   const FakeScreen({
     Key key,
     @required this.debugLabel,
     this.onTap,
+    this.onSecondaryTap,
     this.color,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        color: color ?? Colors.blue,
-        child: Center(
-          child: Text(debugLabel),
+    return Scaffold(
+      backgroundColor: color ?? Colors.blue,
+      appBar: AppBar(
+        title: GestureDetector(
+          onTap: onSecondaryTap,
+          child: Text('Secondary action'),
+        ),
+      ),
+      body: SizedBox(
+        width: double.infinity,
+        height: double.infinity,
+        child: GestureDetector(
+          onTap: onTap,
+          child: Center(
+            child: Text(debugLabel),
+          ),
         ),
       ),
     );
