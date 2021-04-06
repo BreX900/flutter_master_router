@@ -26,7 +26,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final parser = HubRouteInformationParser();
-  final delegate = HubRouterDelegate(initialLocation: WelcomeLocation());
+  final delegate = HubRouterDelegate(locations: [WelcomeLocation()]);
 
   @override
   Widget build(BuildContext context) {

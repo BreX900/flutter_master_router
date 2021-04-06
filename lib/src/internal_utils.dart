@@ -1,5 +1,5 @@
 class HubLog {
-  static bool isEnabled = true;
+  static bool isEnabled = false;
 
   HubLog._();
 

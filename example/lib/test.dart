@@ -5,12 +5,12 @@ import 'package:hub_router/hub_router.dart';
 
 class WelcomeLocation extends HubLocation {
   @override
-  String get bluePath => '/out';
+  String get pathBluePrint => '/out';
 
   @override
   Page buildPage(BuildContext context) {
     return DevicePage(
-      name: bluePath,
+      name: pathBluePrint,
       builder: (context) => FakeScreen(
         debugLabel: 'Welcome',
         onTap: () => context.hub.push(SignInLocation()),
@@ -23,12 +23,12 @@ class WelcomeLocation extends HubLocation {
 
 class SignInLocation extends HubLocation {
   @override
-  String get bluePath => '/out/signIn';
+  String get pathBluePrint => '/out/signIn';
 
   @override
   Page buildPage(BuildContext context) {
     return DevicePage(
-      name: bluePath,
+      name: pathBluePrint,
       builder: (context) => FakeScreen(
         debugLabel: 'Welcome->SignIn',
         onTap: () => context.hub.replaceAll([HomeLocation()]),
@@ -41,12 +41,12 @@ class SignInLocation extends HubLocation {
 
 class HomeLocation extends HubLocation {
   @override
-  String get bluePath => '/in';
+  String get pathBluePrint => '/in';
 
   @override
   Page buildPage(BuildContext context) {
     return DevicePage(
-      name: bluePath,
+      name: pathBluePrint,
       builder: (context) => HomeScreen(),
     );
   }
@@ -54,12 +54,12 @@ class HomeLocation extends HubLocation {
 
 class SettingsLocation extends HubLocation {
   @override
-  String get bluePath => '/in/settings';
+  String get pathBluePrint => '/in/settings';
 
   @override
   Page buildPage(BuildContext context) {
     return DevicePage(
-      name: bluePath,
+      name: pathBluePrint,
       builder: (context) => FakeScreen(debugLabel: 'Home->Settings'),
     );
   }
@@ -67,12 +67,12 @@ class SettingsLocation extends HubLocation {
 
 class ProductsListLocation extends HubLocation {
   @override
-  String get bluePath => '/in/products';
+  String get pathBluePrint => '/in/products';
 
   @override
   Page buildPage(BuildContext context) {
     return DevicePage(
-      name: bluePath,
+      name: pathBluePrint,
       builder: (context) => FakeScreen(
         debugLabel: 'Home\nProducts',
         onTap: () => context.hub.push(ProductLocation()),
@@ -84,12 +84,12 @@ class ProductsListLocation extends HubLocation {
 
 class ProductLocation extends HubLocation {
   @override
-  String get bluePath => '/in/products/:idProduct|';
+  String get pathBluePrint => '/in/products/:idProduct|';
 
   @override
   Page buildPage(BuildContext context) {
     return DevicePage(
-      name: bluePath,
+      name: pathBluePrint,
       builder: (context) => FakeScreen(debugLabel: 'Home\nProducts\nProduct'),
     );
   }
@@ -97,12 +97,12 @@ class ProductLocation extends HubLocation {
 
 class DashboardLocation extends HubLocation {
   @override
-  String get bluePath => '/in/dashboard';
+  String get pathBluePrint => '/in/dashboard';
 
   @override
   Page buildPage(BuildContext context) {
     return DevicePage(
-      name: bluePath,
+      name: pathBluePrint,
       builder: (context) => FakeScreen(debugLabel: 'Home\nDashboard', color: Colors.white),
     );
   }
@@ -110,12 +110,12 @@ class DashboardLocation extends HubLocation {
 
 class InfoLocation extends HubLocation {
   @override
-  String get bluePath => '/in/info';
+  String get pathBluePrint => '/in/info';
 
   @override
   Page buildPage(BuildContext context) {
     return DevicePage(
-      name: bluePath,
+      name: pathBluePrint,
       builder: (context) => FakeScreen(debugLabel: 'Home\nInfo'),
     );
   }
@@ -130,13 +130,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _productsHub = HubDelegate(
-    initialLocation: ProductsListLocation(),
+    locations: [ProductsListLocation()],
   );
   final _homeHub = HubDelegate(
-    initialLocation: DashboardLocation(),
+    locations: [DashboardLocation()],
   );
   final _infoHub = HubDelegate(
-    initialLocation: InfoLocation(),
+    locations: [InfoLocation()],
   );
 
   int _currentIndex = 0;

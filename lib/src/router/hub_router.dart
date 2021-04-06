@@ -40,38 +40,41 @@ class HubDelegate extends RouterDelegate<Uri>
   @override
   final navigatorKey = GlobalKey<NavigatorState>();
 
+  /// The initial location will be the one present in [locations] list at position zero
   HubDelegate({
-    @required HubLocation initialLocation,
-    List<HubLocation> locations,
-  })  : _locations = List.unmodifiable(locations ?? []),
-        _history = [initialLocation];
+    @required List<HubLocation> locations,
+  })  : assert(locations != null && locations.isNotEmpty),
+        _locations = List.unmodifiable(locations),
+        _history = [locations.first];
 
   @override
   Widget build(BuildContext context) {
-    // build a pages based on history locations
-    final pages = history.map((entry) {
-      return entry.buildPage(context);
-    }).toList();
+    final Widget current = Builder(builder: (context) {
+      // build a pages based on history locations
+      final pages = history.map((entry) {
+        return entry.buildPage(context);
+      }).toList();
 
-    HubLog.i.info('history $_history | pages $pages');
+      HubLog.i.info('history $_history | pages $pages');
 
-    final Widget current = Navigator(
-      key: navigatorKey,
-      pages: pages,
-      // It is called:
-      // - after RouterDelegate.popRoute method
-      // - Back CupertinoPageRoute animation
-      // - Navigator.pop method
-      onPopPage: (route, result) {
-        final canPop = route.didPop(result);
-        HubLog.i.info('Navigator.onPopPage($route,$result):$canPop');
-        if (!canPop) return false;
+      return Navigator(
+        key: navigatorKey,
+        pages: pages,
+        // It is called:
+        // - after RouterDelegate.popRoute method
+        // - Back CupertinoPageRoute animation
+        // - Navigator.pop method
+        onPopPage: (route, result) {
+          final canPop = route.didPop(result);
+          HubLog.i.info('Navigator.onPopPage($route,$result):$canPop');
+          if (!canPop) return false;
 
-        HubLog.i.info('Navigator.onPopPage():Popped');
-        final poppedLocation = maybePop();
-        return poppedLocation != null;
-      },
-    );
+          HubLog.i.info('Navigator.onPopPage():Popped');
+          final poppedLocation = maybePop();
+          return poppedLocation != null;
+        },
+      );
+    });
 
     return history.fold(current, (child, location) => location.buildHub(context, child));
   }
@@ -125,7 +128,7 @@ class HubDelegate extends RouterDelegate<Uri>
 
   @deprecated
   void goTo(HubLocation location) {
-    final bluePath = location.bluePath;
+    final bluePath = location.pathBluePrint;
 
     // find locations for arrive a location
     Iterable<HubLocation> locations = _locations;
@@ -133,9 +136,10 @@ class HubDelegate extends RouterDelegate<Uri>
     String currentBlueSegment = '';
     for (final blueSegment in blueSegments) {
       currentBlueSegment = '$currentBlueSegment/$blueSegment';
-      locations = locations.where((l) => l.bluePath.startsWith(currentBlueSegment));
+      locations = locations.where((l) => l.pathBluePrint.startsWith(currentBlueSegment));
     }
-    locations = locations.where((element) => element.bluePath.length <= bluePath.length).toList();
+    locations =
+        locations.where((element) => element.pathBluePrint.length <= bluePath.length).toList();
 
     // generate data from location
 
@@ -190,19 +194,19 @@ class HubDelegate extends RouterDelegate<Uri>
   String toString() => 'HubDelegate{history:$history,child:${_child != null}}';
 }
 
+/// See [HubDelegate]
 class HubRouterDelegate extends HubDelegate {
   final uri = ValueNotifier(Uri.parse('/'));
 
+  /// See [HubDelegate]
   HubRouterDelegate({
-    @required HubLocation initialLocation,
-    List<HubLocation> locations,
+    @required List<HubLocation> locations,
   }) : super(
-          initialLocation: initialLocation,
           locations: locations,
         );
 
   @override
-  Uri get currentConfiguration => Uri.parse(currentLocation.bluePath);
+  Uri get currentConfiguration => Uri.parse(currentLocation.pathBluePrint);
 
   @override
   Future<void> setNewRoutePath(Uri newUri) {

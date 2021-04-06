@@ -4,7 +4,7 @@ abstract class HubLocation {
   /// Ex. /products/:productId/*
   /// ':' Replace it with value. The values is saved in queryParameters
   /// '*' Accept all segments after this keyword
-  String get bluePath;
+  String get pathBluePrint;
 
   /// You can add your Provider her
   Widget buildHub(BuildContext context, Widget child) => child;
@@ -21,7 +21,7 @@ abstract class HubLocation {
   HubLocationData getData() => HubLocationData();
 
   @override
-  String toString() => '$runtimeType(bluePath:$bluePath)';
+  String toString() => '$runtimeType(bluePath:$pathBluePrint)';
 }
 
 @visibleForTesting
