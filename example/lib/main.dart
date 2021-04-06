@@ -1,6 +1,6 @@
-import 'package:example/master.dart';
 import 'package:example/test.dart';
 import 'package:flutter/material.dart';
+import 'package:hub_router/hub_router.dart';
 
 void main() {
   runApp(MyApp());
@@ -24,38 +24,9 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+class _MyAppState extends State<MyApp> {
   final parser = HubRouteInformationParser();
-  final delegate = HubDelegate(
-    locations: [
-      WelcomeLocation(),
-      SignInLocation(),
-      HomeLocation(),
-    ],
-  );
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Future<bool> didPopRoute() {
-    print('Popped');
-    return super.didPopRoute();
-  }
-
-  @override
-  Future<bool> didPushRoute(String route) {
-    print(route);
-    return super.didPushRoute(route);
-  }
-
-  @override
-  Future<bool> didPushRouteInformation(RouteInformation routeInformation) {
-    print('${routeInformation.location} - ${routeInformation.state}');
-    return super.didPushRouteInformation(routeInformation);
-  }
+  final delegate = HubRouterDelegate(initialLocation: WelcomeLocation());
 
   @override
   Widget build(BuildContext context) {
@@ -64,10 +35,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       theme: ThemeData(),
       routeInformationParser: parser,
       routerDelegate: delegate,
-      // routeInformationProvider: PlatformRouteInformationProvider(
-      //   initialRouteInformation: RouteInformation(location: '/'),
-      // ),
-      // backButtonDispatcher: HubBackButtonDispatcher(),
     );
   }
 }

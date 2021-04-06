@@ -1,7 +1,7 @@
-import 'package:example/master.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hub_router/hub_router.dart';
 
 class WelcomeLocation extends HubLocation {
   @override
@@ -130,21 +130,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _productsHub = HubDelegate(
-    locations: [
-      ProductsListLocation(),
-      ProductLocation(),
-    ],
+    initialLocation: ProductsListLocation(),
   );
-
   final _homeHub = HubDelegate(
-    locations: [
-      DashboardLocation(),
-    ],
+    initialLocation: DashboardLocation(),
   );
   final _infoHub = HubDelegate(
-    locations: [
-      InfoLocation(),
-    ],
+    initialLocation: InfoLocation(),
   );
 
   int _currentIndex = 0;
